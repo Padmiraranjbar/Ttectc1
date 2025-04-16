@@ -17,7 +17,7 @@ jobs:
 
     - name: Compile to EXE
       run: |
-        g++ main.cpp -o hello.exe
+        g++ -static main.cpp -o hello.exe
         mkdir build
         move hello.exe build\hello.exe
 
