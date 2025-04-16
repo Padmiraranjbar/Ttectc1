@@ -19,7 +19,7 @@ jobs:
       run: g++ main.cpp -o hello.exe
 
     - name: Upload EXE
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v3.1.3
       with:
         name: hello-windows
         path: hello.exe
