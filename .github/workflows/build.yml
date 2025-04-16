@@ -1,30 +1,42 @@
-name: Build EXE and push to repo
+name: Build Electron App for Windows
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Compile to EXE
-      run: |
-        g++ main.cpp -o hello.exe
-        mkdir build
-        move hello.exe build\hello.exe
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
 
-    - name: Commit and push EXE
-      run: |
-        git config user.name "github-actions"
-        git config user.email "actions@github.com"
-        git add build/hello.exe
-        git commit -m "Add built hello.exe"
-        git push
+      - name: Install dependencies
+        run: |
+          echo Installing Node modules...
+          npm install
+
+      - name: Install Electron Packager
+        run: npm install electron-packager --save-dev
+
+      - name: Build Windows Executable
+        run: |
+          npx electron-packager . t1 \
+            --platform=win32 \
+            --arch=x64 \
+            --out=dist \
+            --overwrite \
+            --executable-name=t1
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: electron-windows-build
+          path: dist/
