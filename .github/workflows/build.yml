@@ -1,9 +1,7 @@
-name: Build C++ Windows EXE
+name: Build EXE and push to repo
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
     branches: [ main ]
   workflow_dispatch:
 
@@ -12,14 +10,21 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout repo
       uses: actions/checkout@v3
-
-    - name: Compile with g++
-      run: g++ main.cpp -o hello.exe
-
-    - name: Upload EXE
-      uses: actions/upload-artifact@v2
       with:
-        name: hello-windows
-        path: hello.exe
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Compile to EXE
+      run: |
+        g++ main.cpp -o hello.exe
+        mkdir build
+        move hello.exe build\hello.exe
+
+    - name: Commit and push EXE
+      run: |
+        git config user.name "github-actions"
+        git config user.email "actions@github.com"
+        git add build/hello.exe
+        git commit -m "Add built hello.exe"
+        git push
